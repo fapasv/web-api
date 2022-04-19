@@ -8,7 +8,7 @@
             {
                 if (contexto.User == null) { return Task.CompletedTask; }
 
-                var permisos = contexto.User.Claims.Where(x => (x.Type == "UsuarioPermiso" || x.Type == "RolPermiso") &&
+                var permisos = contexto.User.Claims.Where(x => (x.Type == "usuario_permiso" || x.Type == "rol_permiso") &&
                                                                     x.Value == requerimiento.Permiso &&
                                                                     x.Issuer == "capacitacion.fapa.net");
 

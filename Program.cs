@@ -59,6 +59,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+builder.Services.AddTransient<ISrvToken, SrvToken>();
 
 builder.Services.AddScoped<ISrvUsuario, SrvUsuario>();
 builder.Services.AddScoped<ISrvRol, SrvRol>();

@@ -13,6 +13,11 @@ namespace webapi.Models
         [Required]
         public string Password { get; set; }
 
+
+        public string RefreshToken { get; set; }
+
+        public DateTime RefreshTokenExpiracion { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<UsuarioRol> UsuarioRoles { get; set; }
 

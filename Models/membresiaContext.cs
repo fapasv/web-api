@@ -38,6 +38,14 @@ namespace webapi.Models
                 entity.Property(e => e.Password)
                     .HasColumnType("character varying")
                     .HasColumnName("password");
+
+                entity.Property(e => e.RefreshToken)
+                    .HasColumnType("character varying")
+                    .HasColumnName("refresh_token");
+
+                entity.Property(e => e.RefreshTokenExpiracion)
+                    .HasColumnType("timestamp")
+                    .HasColumnName("refresh_token_expiracion");
             });
 
             modelBuilder.Entity<UsuarioRol>(entity =>
@@ -123,7 +131,8 @@ namespace webapi.Models
 
                 entity.Property(e => e.Tipo)
                    .HasColumnType("character varying")
-                   .HasColumnName("tipo");
+                   .HasColumnName("tipo")
+                   .IsRequired(false);
 
             });
 

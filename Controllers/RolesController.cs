@@ -108,7 +108,6 @@ namespace webapi.Controllers
         [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
         public async Task<IActionResult> PermissionInRoleAsync(string role)
         {
-
             var rol = await srvRol.EncontrarPorNombre(role);
             if (rol == null)
             {
@@ -116,7 +115,7 @@ namespace webapi.Controllers
             }
 
             var claims = await srvRol.ObtenerPermisos(rol);
-            return Ok(claims.Where(c => c.Tipo == "RolPermiso").Select(c => c.Regla));
+            return Ok(claims.Where(c => c.Tipo == "rol_permiso").Select(c => c.Regla));
 
         }
     }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-
+﻿
 namespace webapi.Services
 {
     public interface ISrvRutas

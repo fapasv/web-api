@@ -17,9 +17,7 @@ namespace webapi.Controllers
             srvRutas = new SrvRutas(proveedor);
             srvRol = srvr;
             srvPermiso = srvp;            
-        }
-
-        
+        }        
 
         // GET: api/<PermisosController>
         [HttpGet]

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -10,12 +11,14 @@ namespace webapi.Controllers
     {
         private readonly ISrvRol srvRol;
         private readonly ISrvUsuario srvUsuario;
+        readonly ISrvToken srvToken;
         private readonly JwtConfig ojwt;
 
-        public AutenticacionController(ISrvRol srvr, ISrvUsuario srvu, IConfiguration configuration)
+        public AutenticacionController(ISrvRol srvr, ISrvUsuario srvu, ISrvToken srvt, IConfiguration configuration)
         {
             srvRol = srvr;
             srvUsuario = srvu;
+            srvToken = srvt;
             ojwt = configuration.GetSection("Jwt").Get<JwtConfig>();
         }
 
@@ -25,7 +28,7 @@ namespace webapi.Controllers
         /// <param name="userModel">Esquema de usuario</param>
         /// <returns>Autorizado</returns>
         [HttpPost]
-        public async Task<IActionResult> LogInAsync([Bind("Nombre,Password")] Usuario userModel) {
+        public async Task<IActionResult> LogInAsync([Bind("Nombre,Password")] Autenticar userModel) {
 
             var userDto = await srvUsuario.EncontrarPorNombre(userModel.Nombre); 
             if (userDto == null)
@@ -51,25 +54,23 @@ namespace webapi.Controllers
                     if (rol != null)
                     {
                         var permisos = await srvRol.ObtenerPermisos(rol);
-                        var RolPermisoClaims = permisos.Select(p => new Claim("RolPermiso", p.Regla)).ToList();
+                        var RolPermisoClaims = permisos.Select(p => new Claim("rol_permiso", p.Regla)).ToList();
                         if (RolPermisoClaims.Any()) { RolPermisoClaims.ForEach(p => authClaims.Add(p)); }
                     }
                 }
             }
+            var tokenExp = DateTime.Now.AddMinutes(30);
+            var token = srvToken.GenerarToken(ojwt, authClaims, tokenExp);
 
-            var token = new JwtSecurityToken(
-                expires: DateTime.Now.AddMinutes(30),
-                claims: authClaims,
-                issuer: ojwt.Issuer,
-                audience: ojwt.Audience,
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(ojwt.Key)),
-                SecurityAlgorithms.HmacSha256Signature)
-                );
+            var refreshToken = srvToken.GenerarRefreshToken();
+            var refreshTokenExp = DateTime.Now.AddDays(7);
+            await srvUsuario.GuardarRefreshToken(userDto, refreshToken, refreshTokenExp);
 
             return Ok(new
             {
-                access_token = new JwtSecurityTokenHandler().WriteToken(token),
-                expires_in = token.ValidTo                
+                access_token = token,
+                expires_in = tokenExp,
+                refresh_token = refreshToken             
             });
         }
 
