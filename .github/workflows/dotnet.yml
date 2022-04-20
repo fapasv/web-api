@@ -24,4 +24,10 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish web-api/webapi.csproj -c Release -o website
+      run: dotnet publish web-api/webapi.csproj -c Release -o webapi
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: webapi
+        path: web-api/webapi
+        if-no-files-found: error
