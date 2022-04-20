@@ -24,4 +24,4 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish
-      run: dotnet publish web-api/webapi.csproj -c Release -o webapi
+      run: dotnet publish webapi.csproj -c Release -o webapi
