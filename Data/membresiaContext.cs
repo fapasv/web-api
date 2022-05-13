@@ -1,5 +1,5 @@
 
-namespace webapi.Models
+namespace webapi.Data
 {
     public partial class membresiaContext : DbContext
     {
@@ -89,7 +89,7 @@ namespace webapi.Models
 
             modelBuilder.Entity<RolPermiso>(entity =>
             {
-                entity.HasKey(e => new { e.IdRol, e.IdPermiso }).HasName("pk_rol_permiso");
+                entity.HasKey(e => new { e.IdRol, e.IdPermiso });
 
                 entity.ToTable("rol_permiso");
 
@@ -102,12 +102,14 @@ namespace webapi.Models
                 entity.HasOne(e => e.RolAsociado)
                     .WithMany(r => r.RolPermisos)
                     .HasForeignKey(e => e.IdRol)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.ClientNoAction);
 
                 entity.HasOne(e => e.PermisoAsociado)
                     .WithMany(p => p.PermisoRoles)
                     .HasForeignKey(e => e.IdPermiso)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.ClientNoAction);
+
+                
             });
 
             modelBuilder.Entity<Permiso>(entity =>
@@ -140,5 +142,7 @@ namespace webapi.Models
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
     }
 }

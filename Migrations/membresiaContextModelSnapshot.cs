@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using webapi.Models;
+using webapi.Data;
 
 #nullable disable
 
@@ -42,7 +42,6 @@ namespace webapi.Migrations
                         .HasColumnName("controlador");
 
                     b.Property<string>("Tipo")
-                        .IsRequired()
                         .HasColumnType("character varying")
                         .HasColumnName("tipo");
 
@@ -82,8 +81,7 @@ namespace webapi.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id_permiso");
 
-                    b.HasKey("IdRol", "IdPermiso")
-                        .HasName("pk_rol_permiso");
+                    b.HasKey("IdRol", "IdPermiso");
 
                     b.HasIndex("IdPermiso");
 
@@ -147,13 +145,13 @@ namespace webapi.Migrations
                     b.HasOne("webapi.Models.Permiso", "PermisoAsociado")
                         .WithMany("PermisoRoles")
                         .HasForeignKey("IdPermiso")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.HasOne("webapi.Models.Rol", "RolAsociado")
                         .WithMany("RolPermisos")
                         .HasForeignKey("IdRol")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
                     b.Navigation("PermisoAsociado");
