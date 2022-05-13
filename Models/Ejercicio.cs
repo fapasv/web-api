@@ -8,7 +8,7 @@
         }
         public Ejercicio(int idLibro, string enunciado)
         {
-            LibroId = idLibro;
+            IdLibro = idLibro;
             Enunciado = enunciado;           
             Respuestas = new HashSet<Respuesta>();
         }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using webapi.Data;
@@ -11,9 +12,10 @@ using webapi.Data;
 namespace webapi.Migrations.libreria
 {
     [DbContext(typeof(libreriaContext))]
-    partial class libreriaContextModelSnapshot : ModelSnapshot
+    [Migration("20220513144924_normalizando campo")]
+    partial class normalizandocampo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
