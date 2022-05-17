@@ -3,26 +3,27 @@ namespace webapi.Controllers
 {
     [Route("api/libros")]
     [ApiController]
+    [AllowAnonymous]
     public class LibrosController : ControllerBase
     {
         private readonly libreriaContext db;
-
+       
         public LibrosController(libreriaContext contexto)
         {
             db = contexto;
         }
 
+        
+
         /// <summary>
         /// Obtiene todos los Libros en la biblioteca
         /// </summary>
         /// <returns>Listado de Libros</returns>
-        [HttpGet]
-        [Authorize(Policy = "RolPermiso.Libros.Get")]
-       
+        [HttpGet]        
         [ProducesResponseType(typeof(List<Libro>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAsync()
         {
-            return Ok(await db.Libros.Include(a => a.Autor).ToListAsync());
+            return Ok(await db.Libros.ToListAsync());
         }
 
         /// <summary>
@@ -30,8 +31,7 @@ namespace webapi.Controllers
         /// </summary>
         /// <param name="id">Identificador de Libro</param>
         /// <returns>Libro</returns>
-        [HttpGet("{id}")]
-        [AllowAnonymous]
+        [HttpGet("{id}")]       
         [ProducesResponseType(typeof(Libro), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAsyncByID(int id)
         {
@@ -49,7 +49,6 @@ namespace webapi.Controllers
         /// <param name="pageSize">libros a mostrar por página</param>
         /// <returns>Listado de libros</returns>
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(typeof(List<Libro>), StatusCodes.Status200OK)]
         [Route("libros_por_pagina")]
         public async Task<IEnumerable<Libro>> GetAsyncPorPagina(int pageNumber, int pageSize) {
@@ -60,7 +59,6 @@ namespace webapi.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         [ProducesResponseType(typeof(List<Libro>), StatusCodes.Status200OK)]
         [Route("buscar/{query}")]
         public async Task<IActionResult> GetAsyncBuscar(string query)
@@ -78,12 +76,11 @@ namespace webapi.Controllers
         /// <param name="libro">Objecto de tipo Libro</param>
         /// <returns>Libro creado</returns>
         [HttpPost]
-        [Authorize]
         [ProducesResponseType(typeof(Libro), StatusCodes.Status201Created)]
         public async Task<IActionResult> PostAsync(Libro libro)
         {
-            db.Libros.Add(libro);
-            await db.SaveChangesAsync();
+            db.Add(libro);
+            await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
             return Created($"/libros/{libro.Id}", libro);
         }
 
@@ -93,18 +90,17 @@ namespace webapi.Controllers
         /// <param name="id">Identificador de Libro</param>
         /// <param name="libro">Información del Libro</param>
         /// <returns>Autor modificado</returns>
-        [HttpPut("{id}")]
-        [Authorize]
-        [ProducesResponseType(typeof(Autor), StatusCodes.Status200OK)]
+        [HttpPut]
+        [ProducesResponseType(typeof(Libro), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> PutAsync([FromQuery] int id, [FromBody] Libro libro)
         {
             var encontrado = await db.Libros.FindAsync(id);
 
             if (encontrado is null) return NotFound();
-            encontrado.Titulo = libro.Titulo;
+            db.Entry(encontrado).CurrentValues.SetValues(libro);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
             return Ok(encontrado);
         }
     }    

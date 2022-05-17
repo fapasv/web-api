@@ -1,4 +1,6 @@
 
+using System.ComponentModel;
+
 namespace webapi.Models
 {
     public partial class Usuario
@@ -10,7 +12,7 @@ namespace webapi.Models
         [Required]
         public string Nombre { get; set; }
 
-        [Required]
+        [Required]        
         public string Password { get; set; }
 
 

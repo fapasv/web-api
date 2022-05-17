@@ -58,12 +58,22 @@ namespace webapi.Controllers
             return Ok(roles);
         }
 
-        
+
         /// <summary>
-        /// Agrega un nuevo Usuario
+        /// Agrega un usuario nuevo
         /// </summary>
-        /// <param name="Usuario">Objecto de tipo Usuario</param>
-        /// <returns>Usuario creado</returns>
+        /// <param name="usuario">Información de Usuario</param>
+        /// <returns>Nuevo Usuario</returns>
+        /// <remarks>
+        /// Ejemplo:
+        ///
+        ///     POST /Usuario
+        ///     {
+        ///        "nombre": "anonimo",
+        ///        "password": "clave"
+        ///     }
+        /// </remarks>
+        /// <response code="201">Retorna un nuevo Usuario creado</response>
         [HttpPost]
         [AllowAnonymous]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status201Created)]

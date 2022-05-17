@@ -1,5 +1,7 @@
 ﻿
 
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, ProveedorPoliticasPermiso>();
@@ -43,6 +45,10 @@ builder.Services.AddSwaggerGen(c =>
     {
         {securityScheme, new string[] { }}
     });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
 });
 
 
@@ -65,8 +71,21 @@ builder.Services.AddScoped<ISrvUsuario, SrvUsuario>();
 builder.Services.AddScoped<ISrvRol, SrvRol>();
 builder.Services.AddScoped<ISrvPermiso, SrvPermiso>();
 
-var app = builder.Build();
+var todo = "AllowOrigin";
+builder.Services.AddCors(c =>
+{
+    c.AddPolicy(todo,
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
 
+var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+app.UseCors(todo);
 app.UseAuthentication();
 app.UseAuthorization();
 
