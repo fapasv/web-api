@@ -7,6 +7,8 @@ namespace webapi.Controllers
     public class EjercicioController : ControllerBase
     {
         private readonly libreriaContext db;
+        private readonly ISrvUsuario srvUsuario;
+
         public EjercicioController(libreriaContext contexto)
         {
             db = contexto;
@@ -25,6 +27,8 @@ namespace webapi.Controllers
         }
 
 
+
+
         /// <summary>
         /// Obtiene un Ejercicio que corresponda con el Identificador.
         /// </summary>
@@ -34,12 +38,28 @@ namespace webapi.Controllers
         [ProducesResponseType(typeof(Ejercicio), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAsyncByID(int id)
         {
-            return await db.Ejercicios.FindAsync(id)
+            return await db.Ejercicios.Include(ej => ej.Respuestas).FirstOrDefaultAsync(ej => ej.Id == id)
                  is Ejercicio ejercicio
                      ? Ok(ejercicio)
                      : NotFound();
 
         }
+
+        [HttpGet]
+        [Route("ejercicios_usuario")]
+        [ProducesResponseType(typeof(Ejercicio), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAsyncByUserID(int id, int userId)
+        {
+            var ej = await db.Ejercicios.FindAsync(id);
+            if (ej is null) { 
+                return NotFound();
+            }
+            ej.Respuestas = await db.Respuestas.Where(r => r.IdUsuario == userId && r.IdEjercicio == id).ToListAsync();
+            return Ok(ej);
+
+        }
+
+
 
         /// <summary>
         /// Obtiene listado de Ejercicios por página
@@ -78,11 +98,16 @@ namespace webapi.Controllers
         /// <returns>ejercicio creado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(Ejercicio), StatusCodes.Status201Created)]
-        public async Task<IActionResult> PostAsync(Ejercicio ejercicio)
+        public async Task<IActionResult> PostAsync(EjercicioVm ejercicio)
         {
-            db.Ejercicios.Add(ejercicio);
+            var ej = new Ejercicio
+            {
+                IdLibro = ejercicio.IdLibro,
+                Enunciado = ejercicio.Enunciado
+            };
+            db.Add(ej);
             await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
-            return Created($"/ejercicios/{ejercicio.Id}", ejercicio);
+            return Created($"/ejercicios/{ej.Id}", ej);
         }
 
         /// <summary>
