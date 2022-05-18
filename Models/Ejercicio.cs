@@ -6,24 +6,17 @@
         {
             Respuestas = new HashSet<Respuesta>();
         }
-        public Ejercicio(int idLibro, string enunciado)
-        {
-            IdLibro = idLibro;
-            Enunciado = enunciado;           
-            Respuestas = new HashSet<Respuesta>();
-        }
+        
       
 
         public int Id { get; set; }
-        public string Enunciado { get; set; }
-
+        public string Enunciado { get; set; } = null!;
         public int IdLibro { get; set; }        
        
         
-        [JsonIgnore]
-        public virtual Libro Libro { get; set; }
 
-        [JsonIgnore]
+        public virtual Libro LibroAsociado { get; set; } = null!;
+
         public virtual ICollection<Respuesta> Respuestas { get; set; }
     }
 }

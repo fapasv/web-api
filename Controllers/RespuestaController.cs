@@ -89,15 +89,22 @@ namespace webapi.Controllers
         /// <summary>
         /// Agrega un nuevo Ejercicio
         /// </summary>
-        /// <param name="ejercicio">Objecto de tipo Ejercicio</param>
+        /// <param name="respuesta">Objecto de tipo Ejercicio</param>
         /// <returns>ejercicio creado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(Ejercicio), StatusCodes.Status201Created)]
-        public async Task<IActionResult> PostAsync(Ejercicio ejercicio)
+        public async Task<IActionResult> PostAsync([FromBody] RespuestaVm respuesta)
         {
-            db.Ejercicios.Add(ejercicio);
+            var r = new Respuesta
+            {
+                IdUsuario = respuesta.IdUsuario,
+                IdEjercicio = respuesta.IdEjercicio,
+                Valor = respuesta.Valor
+            };
+
+            db.Add(r);
             await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
-            return Created($"/libros/{ejercicio.Id}", ejercicio);
+            return Created($"/respuesta/ejercicio_usuario/{r.IdEjercicio},{r.IdUsuario}", r);
         }
 
         /// <summary>
@@ -109,13 +116,14 @@ namespace webapi.Controllers
         [HttpPut]
         [ProducesResponseType(typeof(Respuesta), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutAsync([FromQuery] int id, [FromBody] Respuesta respuesta)
+        public async Task<IActionResult> PutAsync([FromQuery] int idEjercicio, [FromQuery] int idUsuario, [FromBody] RespuestaVm respuesta)
         {
-            var encontrado = await db.Respuestas.FindAsync(id);
+            var encontrado = await db.Respuestas.FirstOrDefaultAsync(r => r.IdUsuario == idUsuario && r.IdEjercicio == idEjercicio);
 
             if (encontrado is null) return NotFound();
 
-            db.Entry(encontrado).CurrentValues.SetValues(respuesta);
+            //db.Entry(encontrado).CurrentValues.SetValues(respuesta);
+            encontrado.Valor = respuesta.Valor;
             await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
 
             return Ok(encontrado);
@@ -127,7 +135,7 @@ namespace webapi.Controllers
         /// <param name="id">Identificador de Respuesta</param>
         /// <returns></returns>
         [HttpDelete]
-        [ProducesResponseType(typeof(Ejercicio), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Respuesta), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAsync(int id)
         {

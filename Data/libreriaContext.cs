@@ -1,7 +1,7 @@
 ﻿
 namespace webapi.Data
 {
-    public partial class libreriaContext : AuditableIdentityContext
+    public partial class libreriaContext :AuditableIdentityContext
     {
         public libreriaContext()
         {
@@ -34,40 +34,38 @@ namespace webapi.Data
                     .HasColumnType("character varying")
                     .HasColumnName("valor");
 
-                entity.HasOne(r => r.Ejercicio)
-                    .WithMany(e => e.Respuestas)
-                    .HasForeignKey(r => r.IdEjercicio)
-                    .OnDelete(DeleteBehavior.ClientCascade);
+                entity.HasOne(d => d.EjercicioAsociado)
+                    .WithMany(p => p.Respuestas)
+                    .HasForeignKey(d => d.IdEjercicio)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<Ejercicio>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("pk_ejercicio");
                 entity.ToTable("ejercicios");
 
-                entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd(); 
+                entity.HasIndex(e => e.IdLibro, "IX_ejercicios_id_libro");
+
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Enunciado)
                     .HasColumnType("character varying")
                     .HasColumnName("enunciado");
 
-                entity.Property(e => e.IdLibro)
-                   .HasColumnName("id_libro");               
+                entity.Property(e => e.IdLibro).HasColumnName("id_libro");
 
-                entity.HasOne(d => d.Libro)
-                   .WithMany(p => p.Ejercicios)
-                   .HasForeignKey(d => d.IdLibro)                   
-                   .HasConstraintName("fk_libro");
+                entity.HasOne(d => d.LibroAsociado)
+                    .WithMany(p => p.Ejercicios)
+                    .HasForeignKey(d => d.IdLibro)
+                    .HasConstraintName("fk_libro");
             });
            
             modelBuilder.Entity<Libro>(entity =>
             {
-                entity.HasKey(e => e.Id).HasName("pk_libro");
-
                 entity.ToTable("libros");
 
-                entity.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
-               
+                entity.Property(e => e.Id).HasColumnName("id");
+
                 entity.Property(e => e.Titulo)
                     .HasColumnType("character varying")
                     .HasColumnName("titulo");

@@ -77,11 +77,12 @@ namespace webapi.Controllers
         /// <returns>Libro creado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(Libro), StatusCodes.Status201Created)]
-        public async Task<IActionResult> PostAsync(Libro libro)
+        public async Task<IActionResult> PostAsync(LibroVm libro)
         {
-            db.Add(libro);
+            var l = new Libro() { Titulo = libro.Titulo };
+            db.Add(l);
             await db.SaveChangesAsync(User?.FindFirst(ClaimTypes.Name)?.Value);
-            return Created($"/libros/{libro.Id}", libro);
+            return Created($"/libros/{l.Id}", l);
         }
 
         /// <summary>
